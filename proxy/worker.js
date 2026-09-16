@@ -1,5 +1,5 @@
 /**
- * Kommunolabium – Vermittler zur Anthropic-API
+ * Sprachbuch – Vermittler zur Anthropic-API
  * ═══════════════════════════════════════════════════════════════════════════
  *
  * Die beiden Seiten liegen als statisches HTML auf GitHub Pages. Ein API-
@@ -7,8 +7,9 @@
  * aus dem Browser scheitern ohnehin an CORS. Dieser Worker hält den Schlüssel
  * serverseitig und bietet genau zwei eng gefasste Endpunkte an:
  *
- *   POST /klassifiziere  { instrument, wort }              → { domaene }
- *   POST /deute          { instrument, wort, domaene, sprache } → { text }
+ *   POST /klassifiziere  { instrument, wort }  → { profil, domaene }
+ *   POST /deute          { instrument, wort, domaene, sprache,
+ *                          profil?, schale?, pol? }  → { text }
  *
  * Die Prompts entstehen hier, nicht beim Aufrufer. Wer die Worker-URL findet,
  * kann das Instrument benutzen – aber nicht beliebige Anfragen auf fremde
@@ -35,7 +36,7 @@ const MAX_WORTLAENGE = 80;
 // holt sie beim ersten Aufruf und hält sie danach zwischengespeichert, damit
 // eine Änderung an der Tabelle nicht bedeutet, den Worker neu einzuspielen.
 
-const DOMAENEN_URL = "https://abuelia81.github.io/kommunolabium/domaenen.json";
+const DOMAENEN_URL = "https://abuelia81.github.io/Sprachbuch/domaenen.json";
 const CACHE_MS = 10 * 60 * 1000;
 
 let domCache = null;

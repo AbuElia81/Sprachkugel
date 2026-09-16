@@ -20,8 +20,8 @@ Anleitung braucht beides nicht — sie läuft komplett im Browser.
    kostenloses Konto anlegen — das musst du selbst tun, ich kann keine Konten
    erstellen).
 2. **Compute (Workers)** → **Create** → **Start from Hello World!** → **Deploy**.
-3. Namen vergeben, z. B. `kommunolabium-proxy`. Die URL lautet danach
-   `https://kommunolabium-proxy.<dein-name>.workers.dev`.
+3. Namen vergeben, z. B. `sprachbuch-proxy`. Die URL lautet danach
+   `https://sprachbuch-proxy.<dein-name>.workers.dev`.
 4. **Edit code** öffnen, den gesamten Inhalt von `worker.js` aus diesem Ordner
    hineinkopieren (den vorhandenen Beispielcode ersetzen), **Deploy**.
 
@@ -49,7 +49,7 @@ const PROXY="PROXY_URL_HIER_EINSETZEN";
 Dort die Worker-URL einsetzen, **ohne Schrägstrich am Ende**:
 
 ```js
-const PROXY="https://kommunolabium-proxy.dein-name.workers.dev";
+const PROXY="https://sprachbuch-proxy.dein-name.workers.dev";
 ```
 
 Solange der Platzhalter steht, zeigen die Seiten den Hinweis
@@ -139,7 +139,7 @@ Die Domänen stehen nur an einer Stelle: in `domaenen.json` im Wurzelverzeichnis
 des Repos. Beide HTML-Seiten laden sie beim Start, der Worker holt sie von
 
 ```
-https://abuelia81.github.io/kommunolabium/domaenen.json
+https://abuelia81.github.io/Sprachbuch/domaenen.json
 ```
 
 und hält sie zehn Minuten lang zwischengespeichert. Eine Änderung an der Tabelle

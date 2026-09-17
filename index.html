@@ -35,7 +35,11 @@ h1{font-family:'Cinzel',serif;font-size:clamp(.9rem,2.5vw,1.3rem);
   border-radius:2px;pointer-events:none;}
 .cl2{font-family:'Cinzel',serif;font-size:.56rem;letter-spacing:.2em;color:var(--gd);
   text-transform:uppercase;margin-bottom:8px;display:block;}
-.lang-row{display:flex;flex-wrap:wrap;gap:4px;}
+/* Sprachen als schmale Leiste über der Kugel, bewusst zurückhaltend. */
+.sprachen{display:flex;flex-wrap:wrap;gap:3px;justify-content:center;
+  max-width:760px;margin-bottom:18px;}
+.sprachen .lbtn{font-size:.5rem;padding:3px 6px;letter-spacing:.04em;
+  border-color:rgba(138,110,40,.55);}
 .lbtn{background:#0a0a16;border:1px solid var(--gd);color:var(--gd);
   font-family:'Cinzel',serif;font-size:.58rem;padding:4px 8px;cursor:pointer;
   border-radius:2px;transition:all .15s;letter-spacing:.05em;}
@@ -93,6 +97,8 @@ h1{font-family:'Cinzel',serif;font-size:clamp(.9rem,2.5vw,1.3rem);
 <h1>Sprachkugel</h1>
 <p class="sub">Bildschemata · Schalen nach Sweetser · Pole nach Bühler</p>
 
+<nav class="sprachen" id="langRow" aria-label="Sprache"></nav>
+
 <div class="stage">
   <div class="aw">
     <div class="wiege">
@@ -105,8 +111,11 @@ h1{font-family:'Cinzel',serif;font-size:clamp(.9rem,2.5vw,1.3rem);
 
   <div class="panel">
     <div class="card">
-      <span class="cl2">Sprache</span>
-      <div class="lang-row" id="langRow"></div>
+      <span class="cl2" id="promptLabel">Wort · Konzept · Erfahrung</span>
+      <div class="prow">
+        <input id="pin" type="text" placeholder="z.B. Freiheit, Grenze, Sturz…" autocomplete="off">
+        <button class="btn" id="sendBtn">→</button>
+      </div>
     </div>
 
     <div class="card">
@@ -128,14 +137,6 @@ h1{font-family:'Cinzel',serif;font-size:clamp(.9rem,2.5vw,1.3rem);
       <p class="hinweis">Die Schale wählt die Leseebene, die Lage den Pol der Zeichensituation.
         Beide gehen in die Deutung ein: Wer die Kugel weiterdreht oder tiefer schält
         und dasselbe Wort erneut schickt, bekommt eine andere Antwort.</p>
-    </div>
-
-    <div class="card">
-      <span class="cl2" id="promptLabel">Wort · Konzept · Erfahrung</span>
-      <div class="prow">
-        <input id="pin" type="text" placeholder="z.B. Freiheit, Grenze, Sturz…" autocomplete="off">
-        <button class="btn" id="sendBtn">→</button>
-      </div>
     </div>
 
     <div class="card">

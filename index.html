@@ -9,13 +9,21 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--gold:#c8a84b;--gl:#e8c96a;--gd:#8a6e28;--bg:#07070f;--bg2:#0f0f1c;--ivory:#f0e8d0;}
 body{background:var(--bg);color:var(--ivory);font-family:'IM Fell English',serif;
-  min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:16px;}
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:16px;
+  overflow-x:hidden;}  /* die Hand ragt bewusst über ihren Container hinaus */
 h1{font-family:'Cinzel',serif;font-size:clamp(.9rem,2.5vw,1.3rem);
   letter-spacing:.25em;color:var(--gold);text-align:center;margin-bottom:1px;text-transform:uppercase;}
 .sub{font-size:.62rem;color:var(--gd);letter-spacing:.15em;margin-bottom:14px;font-style:italic;text-align:center;}
 .stage{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;justify-content:center;width:100%;max-width:1160px;}
 .aw{position:relative;width:min(490px,92vw);flex-shrink:0;}
-#kugel{width:100%;height:auto;display:block;touch-action:none;cursor:grab;
+/* Die Wiege: die Hand liegt hinter der Kugel, die Kugel ruht in der Mulde.
+   mix-blend-mode:screen lässt den schwarzen Grund des Fotos verschwinden. */
+.wiege{position:relative;padding-bottom:20%;}
+.hand{position:absolute;left:50%;bottom:0;width:138%;
+  transform:translateX(-50%);mix-blend-mode:screen;
+  pointer-events:none;user-select:none;z-index:0;opacity:.92;}
+#kugel{position:relative;z-index:1;
+  width:100%;height:auto;display:block;touch-action:none;cursor:grab;
   filter:drop-shadow(0 0 30px rgba(200,168,75,.22));}
 #kugel:active{cursor:grabbing}
 #kugel:focus-visible{outline:1px solid var(--gold);outline-offset:4px}
@@ -78,6 +86,7 @@ h1{font-family:'Cinzel',serif;font-size:clamp(.9rem,2.5vw,1.3rem);
 .loading::after{content:'…';animation:ld 1s steps(3,end) infinite;}
 @keyframes ld{0%{content:'.'}33%{content:'..'}66%{content:'...'}100%{content:'…'}}
 @media (prefers-reduced-motion:reduce){.fi{animation:none}.bar-f{transition:none}}
+@media (max-width:560px){ .hand{width:118%} .wiege{padding-bottom:16%} }
 </style>
 </head>
 <body>
@@ -86,8 +95,11 @@ h1{font-family:'Cinzel',serif;font-size:clamp(.9rem,2.5vw,1.3rem);
 
 <div class="stage">
   <div class="aw">
-    <canvas id="kugel" width="900" height="900" tabindex="0"
-      role="img" aria-label="Drehbare Sprachkugel mit acht Bildschema-Domänen und drei Bedeutungsschalen"></canvas>
+    <div class="wiege">
+      <img class="hand" src="hand.jpg" alt="" aria-hidden="true">
+      <canvas id="kugel" width="900" height="900" tabindex="0"
+        role="img" aria-label="Drehbare Sprachkugel mit acht Bildschema-Domänen und drei Bedeutungsschalen"></canvas>
+    </div>
     <p class="hint">Ziehen zum Drehen · Pfeiltasten möglich</p>
   </div>
 
@@ -152,8 +164,6 @@ const LANGS = [
    ph:"مثلاً: حرية، حدود، سقوط…", pl:"كلمة · مفهوم · تجربة", rl:"إجابة الأداة"},
   {code:"fr",name:"Français", flag:"🇫🇷",rtl:false,systemLang:"Französisch",
    ph:"ex. liberté, frontière, chute…", pl:"Mot · Concept · Expérience", rl:"Réponse de l'Instrument"},
-  {code:"pt",name:"Português",flag:"🇵🇹",rtl:false,systemLang:"Portugiesisch",
-   ph:"ex. liberdade, fronteira, queda…", pl:"Palavra · Conceito · Experiência", rl:"Resposta do Instrumento"},
 ];
 let currentLang = LANGS[0];
 

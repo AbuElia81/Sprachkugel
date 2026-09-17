@@ -1,5 +1,5 @@
 /**
- * Sprachbuch – Vermittler zur Anthropic-API
+ * Sprachkugel – Vermittler zur Anthropic-API
  * ═══════════════════════════════════════════════════════════════════════════
  *
  * Die beiden Seiten liegen als statisches HTML auf GitHub Pages. Ein API-
@@ -36,7 +36,7 @@ const MAX_WORTLAENGE = 80;
 // holt sie beim ersten Aufruf und hält sie danach zwischengespeichert, damit
 // eine Änderung an der Tabelle nicht bedeutet, den Worker neu einzuspielen.
 
-const DOMAENEN_URL = "https://abuelia81.github.io/Sprachbuch/domaenen.json";
+const DOMAENEN_URL = "https://abuelia81.github.io/Sprachkugel/domaenen.json";
 const CACHE_MS = 10 * 60 * 1000;
 
 let domCache = null;

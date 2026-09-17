@@ -272,12 +272,96 @@ function mischeFarbe(a,b,t){
 const cv=document.getElementById("kugel"), ctx=cv.getContext("2d");
 const W=cv.width, CX=W/2, CY=W/2, RAD=W*0.395;
 
-// Materialaufnahme der Bronzekugel. Schlägt das Laden fehl, zeichnet die Kugel
-// wie zuvor in flachen Farben weiter — das Bild ist Schmuck, keine Bedingung.
-const bronze = new Image();
-let bronzeBereit = false;
-bronze.onload = ()=>{ bronzeBereit = true; zeichne(); };
+// Zwei Bilder, zwei Aufgaben: bronze.jpg ist die Beleuchtung (Matcap, steht im
+// Blickraum still), patina.jpg die Oberfläche (gleichrechteckige Karte, dreht
+// mit). Fehlt eines, zeichnet die Kugel in flachen Farben weiter.
+const bronze = new Image(), patina = new Image();
+let lichtDaten=null, hautDaten=null, bronzeBereit=false;
+
+function bildDaten(img){
+  const c=document.createElement("canvas");
+  c.width=img.naturalWidth; c.height=img.naturalHeight;
+  const x=c.getContext("2d", {willReadFrequently:true});
+  x.drawImage(img,0,0);
+  try{ return x.getImageData(0,0,c.width,c.height); }catch(e){ return null; }
+}
+function pruefeBilder(){
+  if(!bronze.complete || !patina.complete) return;
+  if(!bronze.naturalWidth || !patina.naturalWidth) return;
+  lichtDaten = bildDaten(bronze);
+  hautDaten  = bildDaten(patina);
+  bronzeBereit = !!(lichtDaten && hautDaten);
+  zeichne();
+}
+bronze.onload = pruefeBilder;
+patina.onload = pruefeBilder;
 bronze.src = "bronze.jpg";
+patina.src = "patina.jpg";
+
+// Hilfsfläche für den Kugelkörper. Halbe Auflösung genügt – die Oberfläche
+// wird beim Hochskalieren geglättet, die Gravur liegt ohnehin darüber.
+const KOERPER = 460;
+const kFlaeche = document.createElement("canvas");
+kFlaeche.width = kFlaeche.height = KOERPER;
+const kCtx = kFlaeche.getContext("2d");
+let kBild = null, kStand = "";
+
+// Die Naht der Karte liegt bei 180°, mitten in der Domäne KRAFT. Um 22,5°
+// verschoben fällt sie genau auf die Lune-Grenze, wo eine Gravurlinie sie deckt.
+const NAHT_VERSATZ = 22.5/360;
+
+function koerperZeichnen(){
+  const stand = `${yaw.toFixed(4)}|${pitch.toFixed(4)}`;
+  if(kStand === stand && kBild) return;            // Drehung unverändert
+  kStand = stand;
+
+  const bild = kCtx.createImageData(KOERPER, KOERPER);
+  const d = bild.data;
+  const m = KOERPER/2, R = m - 1;
+
+  // Umkehrung der Drehung: erst Neigung, dann Längsdrehung zurück.
+  const cy=Math.cos(yaw), sy=Math.sin(yaw);
+  const cp=Math.cos(pitch), sp=Math.sin(pitch);
+
+  const L=lichtDaten.data, LW=lichtDaten.width, LH=lichtDaten.height;
+  const H=hautDaten.data,  HW=hautDaten.width,  HH=hautDaten.height;
+
+  for(let py=0; py<KOERPER; py++){
+    const ny = (m - py)/R;
+    for(let px=0; px<KOERPER; px++){
+      const nx = (px - m)/R;
+      const q = nx*nx + ny*ny;
+      if(q > 1) continue;
+      const nz = Math.sqrt(1 - q);
+      const i = (py*KOERPER + px)*4;
+
+      // Normale zurück in den Kugelraum drehen
+      const y1 =  ny*cp + nz*sp;
+      const z1 = -ny*sp + nz*cp;
+      const ox =  nx*cy - z1*sy;
+      const oz =  nx*sy + z1*cy;
+      const oy =  y1;
+
+      // Länge und Breite -> Bildpunkt der Karte
+      let u = Math.atan2(ox, oz)/(2*Math.PI) + 0.5 + NAHT_VERSATZ;
+      u -= Math.floor(u);
+      const v = Math.acos(Math.max(-1,Math.min(1,oy)))/Math.PI;
+      const hi = ((Math.min(HH-1,(v*HH)|0))*HW + Math.min(HW-1,(u*HW)|0))*4;
+
+      // Beleuchtung aus der Matcap an derselben Bildschirmstelle. Bewusst pro
+      // Kanal: Die Matcap trägt nicht nur die Helligkeit, sondern die warme
+      // Lichtfarbe der Bronze — nur ihre Helligkeit zu nehmen ergibt Stein.
+      const li = (((( (1-(ny+1)/2) * LH)|0)*LW) + ((((nx+1)/2)*LW)|0))*4;
+      const k = 1/118;
+      d[i]   = Math.min(255, H[hi]   * L[li]   * k);
+      d[i+1] = Math.min(255, H[hi+1] * L[li+1] * k);
+      d[i+2] = Math.min(255, H[hi+2] * L[li+2] * k);
+      d[i+3] = 255;
+    }
+  }
+  kCtx.putImageData(bild, 0, 0);
+  kBild = kFlaeche;
+}
 
 let yaw=0.5, pitch=-0.26, schale=0;
 let aktivesProfil=null, aktiveDomaene=null, aktivesWort=null;
@@ -362,8 +446,9 @@ function zeichne(){
   ctx.beginPath(); ctx.arc(CX,CY,r,0,Math.PI*2); ctx.clip();
 
   if(bronzeBereit){
-    // Der Kugelkörper: die Materialaufnahme, unbewegt im Blickraum.
-    ctx.drawImage(bronze, CX-r, CY-r, 2*r, 2*r);
+    // Der Kugelkörper: Oberfläche mal Licht, pixelweise gerechnet.
+    koerperZeichnen();
+    ctx.drawImage(kBild, CX-r, CY-r, 2*r, 2*r);
 
     // Domänen als Farbschleier – Farbton von der Domäne, Helligkeit vom Metall.
     ctx.globalCompositeOperation="color";

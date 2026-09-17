@@ -61,7 +61,7 @@ h1{font-family:'Cinzel',serif;font-size:clamp(.9rem,2.5vw,1.3rem);
 .bar{display:grid;grid-template-columns:7.4rem 1fr 2.2rem;gap:7px;align-items:center;}
 .bar-n{font-family:'Cinzel',serif;font-size:.5rem;letter-spacing:.06em;color:var(--gd);text-transform:uppercase;}
 .bar-t{height:6px;background:#0a0a16;border:1px solid rgba(200,168,75,.14);border-radius:1px;overflow:hidden;}
-.bar-f{height:100%;transition:width .55s ease;}
+.bar-f{display:block;height:100%;transition:width .55s ease;}
 .bar-v{font-family:'Cinzel',serif;font-size:.52rem;color:var(--gd);text-align:right;}
 /* Schalen und Pol */
 .schalen{display:flex;flex-wrap:wrap;gap:4px;}
@@ -262,6 +262,13 @@ function mischeFarbe(a,b,t){
 const cv=document.getElementById("kugel"), ctx=cv.getContext("2d");
 const W=cv.width, CX=W/2, CY=W/2, RAD=W*0.395;
 
+// Materialaufnahme der Bronzekugel. Schlägt das Laden fehl, zeichnet die Kugel
+// wie zuvor in flachen Farben weiter — das Bild ist Schmuck, keine Bedingung.
+const bronze = new Image();
+let bronzeBereit = false;
+bronze.onload = ()=>{ bronzeBereit = true; zeichne(); };
+bronze.src = "bronze.jpg";
+
 let yaw=0.5, pitch=-0.26, schale=0;
 let aktivesProfil=null, aktiveDomaene=null, aktivesWort=null;
 let selbstDreht=true, nutzerHatGedreht=false;
@@ -335,22 +342,61 @@ function zeichne(){
   }
   flaechen.sort((a,b)=>a.z-b.z);
 
-  for(const f of flaechen){
-    const dom=DOMAINS[f.i];
-    const stark=(aktiveDomaene===f.i);
-    const grund=stark?dom.highlight:mischeFarbe(dom.color,dom.highlight,Math.min(1,g[f.i]*1.6));
+  const pfad=(f)=>{
     ctx.beginPath();
     f.rand.forEach((p,k)=>{const q=auf(drehen(p),r); k?ctx.lineTo(q.sx,q.sy):ctx.moveTo(q.sx,q.sy);});
     ctx.closePath();
-    ctx.globalAlpha=0.62+f.z*0.3;
-    ctx.fillStyle=grund; ctx.fill();
-    ctx.globalAlpha=1;
-    if(g[f.i]>0.01){
-      ctx.fillStyle=`rgba(232,201,106,${(g[f.i]*0.30).toFixed(3)})`; ctx.fill();
+  };
+
+  ctx.save();
+  ctx.beginPath(); ctx.arc(CX,CY,r,0,Math.PI*2); ctx.clip();
+
+  if(bronzeBereit){
+    // Der Kugelkörper: die Materialaufnahme, unbewegt im Blickraum.
+    ctx.drawImage(bronze, CX-r, CY-r, 2*r, 2*r);
+
+    // Domänen als Farbschleier – Farbton von der Domäne, Helligkeit vom Metall.
+    ctx.globalCompositeOperation="color";
+    for(const f of flaechen){
+      const dom=DOMAINS[f.i];
+      const stark=(aktiveDomaene===f.i);
+      pfad(f);
+      ctx.globalAlpha=stark?0.72:(0.30+g[f.i]*0.34);
+      ctx.fillStyle=stark?dom.highlight:dom.color;
+      ctx.fill();
     }
-    ctx.strokeStyle=`rgba(200,168,75,${(0.10+f.z*0.16).toFixed(3)})`;
+    // Gewichtete Domänen glimmen zusätzlich auf.
+    ctx.globalCompositeOperation="lighter";
+    for(const f of flaechen){
+      const zu=(aktiveDomaene===f.i?0.14:0)+g[f.i]*0.16;
+      if(zu<0.01) continue;
+      pfad(f);
+      ctx.globalAlpha=zu*(0.4+f.z*0.6);
+      ctx.fillStyle="#e8c96a"; ctx.fill();
+    }
+    ctx.globalCompositeOperation="source-over";
+    ctx.globalAlpha=1;
+  } else {
+    // Rückfall ohne Bild: flache Farbflächen wie vor der Bronze.
+    for(const f of flaechen){
+      const dom=DOMAINS[f.i];
+      const stark=(aktiveDomaene===f.i);
+      pfad(f);
+      ctx.globalAlpha=0.62+f.z*0.3;
+      ctx.fillStyle=stark?dom.highlight
+        :mischeFarbe(dom.color,dom.highlight,Math.min(1,g[f.i]*1.6));
+      ctx.fill();
+      ctx.globalAlpha=1;
+    }
+  }
+
+  // Gravur: die Ränder der Domänenfelder
+  for(const f of flaechen){
+    pfad(f);
+    ctx.strokeStyle=`rgba(232,201,106,${(0.07+f.z*0.13).toFixed(3)})`;
     ctx.lineWidth=1; ctx.stroke();
   }
+  ctx.restore();
 
   ctx.beginPath(); ctx.arc(CX,CY,r,0,Math.PI*2);
   ctx.strokeStyle="rgba(200,168,75,.5)"; ctx.lineWidth=1.6; ctx.stroke();
@@ -365,14 +411,16 @@ function zeichne(){
 
   // Domänennamen auf den zugewandten Spalten
   ctx.font="600 17px Cinzel, Georgia, serif"; ctx.textAlign="center"; ctx.textBaseline="middle";
+  ctx.shadowColor="rgba(0,0,0,.9)"; ctx.shadowBlur=7;
   for(let i=0;i<8;i++){
     const p=drehen(aufKugel(i*45,0));
     if(p.z<0.32) continue;
     const q=auf(p,r*1.01);
     const name=DOMAINS[i].names[currentLang.code]||DOMAINS[i].id;
-    ctx.fillStyle=`rgba(240,232,208,${(p.z*0.92).toFixed(2)})`;
+    ctx.fillStyle=`rgba(247,240,216,${Math.min(1,p.z*1.15).toFixed(2)})`;
     ctx.fillText(name,q.sx,q.sy);
   }
+  ctx.shadowBlur=0;
 
   // Bühler-Pole
   const vorn=polVorn();
@@ -384,8 +432,10 @@ function zeichne(){
     ctx.beginPath(); ctx.arc(q.sx,q.sy,an?9:5,0,Math.PI*2);
     ctx.fillStyle=an?"#e8c96a":"rgba(200,168,75,.38)"; ctx.fill();
     ctx.font=`${an?"600 15px":"400 13px"} Cinzel, Georgia, serif`;
+    ctx.shadowColor="rgba(0,0,0,.9)"; ctx.shadowBlur=6;
     ctx.fillStyle=an?"#e8c96a":`rgba(200,168,75,${(p.z*.45).toFixed(2)})`;
     ctx.fillText(pol.kurz,q.sx,q.sy-21);
+    ctx.shadowBlur=0;
   });
 
   document.getElementById("vornWort").textContent=POLE[vorn].id;
@@ -440,7 +490,7 @@ function richteAus(prof){
   const balken=DOMAINS.map((d,i)=>`
     <div class="bar">
       <span class="bar-n">${d.names[currentLang.code]||d.id}</span>
-      <span class="bar-t"><span class="bar-f" style="background:${d.highlight};width:${Math.round(g[i]*100)}%"></span></span>
+      <span class="bar-t"><span class="bar-f" style="background:${mischeFarbe(d.highlight,'#e8c96a',.5)};width:${Math.round(g[i]*100)}%"></span></span>
       <span class="bar-v">${g[i]?Math.round(g[i]*100)+'%':'–'}</span>
     </div>`).join('');
   document.getElementById('domBox').innerHTML=`

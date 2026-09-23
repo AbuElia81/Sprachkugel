@@ -9,8 +9,8 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--gold:#c8a84b;--gl:#e8c96a;--gd:#8a6e28;--bg:#07070f;--bg2:#0f0f1c;--ivory:#f0e8d0;}
 body{background:var(--bg);color:var(--ivory);font-family:'IM Fell English',serif;
-  min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:16px;
-  overflow-x:hidden;}  /* die Hand ragt bewusst über ihren Container hinaus */
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;
+  padding:16px 16px 40px;overflow-x:hidden;}  /* die Hand ragt bewusst über ihren Container hinaus */
 h1{font-family:'Cinzel',serif;font-size:clamp(.9rem,2.5vw,1.3rem);
   letter-spacing:.25em;color:var(--gold);text-align:center;margin-bottom:1px;text-transform:uppercase;}
 .sub{font-size:.62rem;color:var(--gd);letter-spacing:.15em;margin-bottom:14px;font-style:italic;text-align:center;}
@@ -85,6 +85,17 @@ h1{font-family:'Cinzel',serif;font-size:clamp(.9rem,2.5vw,1.3rem);
 .lesart{margin-top:9px;padding-top:8px;border-top:1px solid rgba(200,168,75,.12);}
 .lesart-t{font-size:.86rem;line-height:1.7;color:var(--ivory);}
 .lesart-l{color:#3a3a4a;font-style:italic;font-size:.78rem;}
+/* Unterstützung: dieselbe Sprache wie die Sprachleiste, nur wärmer. */
+.spende{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;
+  gap:7px;margin-top:26px;padding-top:16px;
+  border-top:1px solid rgba(200,168,75,.12);width:100%;max-width:760px;}
+.spende-k{font-family:'Cinzel',serif;font-size:.52rem;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--gd);}
+.spende a{font-family:'Cinzel',serif;font-size:.6rem;letter-spacing:.08em;
+  color:var(--gold);text-decoration:none;padding:4px 11px;border-radius:2px;
+  border:1px solid rgba(200,168,75,.35);background:#0a0a16;transition:all .16s;}
+.spende a:hover{background:var(--gd);color:var(--ivory);border-color:var(--gold);}
+.spende a:focus-visible{outline:1px solid var(--gl);outline-offset:2px}
 @keyframes fu{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 .fi{animation:fu .35s ease both;}
 .loading::after{content:'…';animation:ld 1s steps(3,end) infinite;}
@@ -145,6 +156,13 @@ h1{font-family:'Cinzel',serif;font-size:clamp(.9rem,2.5vw,1.3rem);
     </div>
   </div>
 </div>
+
+<footer class="spende">
+  <span class="spende-k">Diese Arbeit unterstützen</span>
+  <a href="https://www.paypal.me/scholaastronomica/4EUR"  target="_blank" rel="noopener noreferrer">4 €</a>
+  <a href="https://www.paypal.me/scholaastronomica/9EUR"  target="_blank" rel="noopener noreferrer">9 €</a>
+  <a href="https://www.paypal.me/scholaastronomica/12EUR" target="_blank" rel="noopener noreferrer">12 €</a>
+</footer>
 
 <script>
 // ══════════════════════════════════════════════════════════════════════════════

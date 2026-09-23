@@ -1,5 +1,5 @@
 {
-  "_hinweis": "Einzige Quelle der Domaenentabelle. Gelesen von kommunikationslabium.html, astrolabium.html und proxy/worker.js. Reihenfolge = Index im Lexikon.",
+  "_hinweis": "Einzige Quelle der Domaenentabelle. Gelesen von index.html und proxy/worker.js. Reihenfolge = Index im Lexikon.",
   "domaenen": [
     {
       "id": "RAUM",

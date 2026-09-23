@@ -1,6 +1,6 @@
 # Vermittler einrichten
 
-Die beiden Instrumentenseiten liegen als statisches HTML auf GitHub Pages und
+Die Seite liegt als statisches HTML auf GitHub Pages und
 können die Anthropic-API nicht direkt aufrufen: Ein Schlüssel im Quelltext wäre
 für jeden Besucher lesbar, und der Browser blockt Direktaufrufe ohnehin per CORS.
 
@@ -39,8 +39,7 @@ Danach **Deploy**. Den Schlüssel bitte selbst eintragen und mir nicht schicken.
 
 ## 3. URL in die beiden Seiten eintragen
 
-In `kommunikationslabium.html` und `astrolabium.html` steht jeweils oben im
-Skript:
+In `index.html` steht oben im Skript:
 
 ```js
 const PROXY="PROXY_URL_HIER_EINSETZEN";
@@ -97,8 +96,7 @@ Index außerhalb der Tabelle, Anteile ≤ 0 oder > 1, doppelte Domäne, Summe ni
 | `schale` | `Inhalt`, `Epistemisch`, `Sprechakt`        | `Inhalt`       |
 | `pol`    | `Darstellung`, `Ausdruck`, `Appell`         | `Darstellung`  |
 
-Die Sprachkugel schickt beide mit; die beiden älteren Seiten kennen sie nicht und
-bekommen die Voreinstellung — ihre Antworten bleiben also unverändert.
+Fehlt eine Angabe, gilt die Voreinstellung.
 
 Wichtig für die Sicherheit: Der Aufrufer schickt **nur eine Kennung aus dieser
 Liste**, kein Stück Prompt. Die zugehörigen Anweisungen stehen in `worker.js`.
@@ -156,7 +154,6 @@ nachgeschlagen wird im Browser; er sieht ein Wort erst, wenn das Lexikon es nich
 
 ## Instrumente
 
-Drei Seiten benutzen den Vermittler und schicken ihre Kennung im Feld `instrument` mit:
-`kommunikationslabium`, `astrolabium` und `sprachkugel`. Jede hat im Worker ihre eigene
-Anrede; die Domänen teilen sie sich. Eine vierte Seite braucht nur einen weiteren
-Eintrag in `INSTRUMENTE`.
+Die Seite schickt ihre Kennung im Feld `instrument` mit; zur Zeit gibt es nur
+`sprachkugel`. Die zugehörige Anrede steht im Worker. Eine weitere Seite braucht
+nur einen zusätzlichen Eintrag in `INSTRUMENTE`.

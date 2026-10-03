@@ -7,6 +7,9 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Cinzel:wght@400;600&family=Noto+Naskh+Arabic&display=swap');
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+/* Die Hand ragt bewusst über ihren Container hinaus. overflow-x auf body
+   allein genügt nicht — das html-Element scrollt sonst weiter. */
+html{overflow-x:hidden}
 :root{--gold:#c8a84b;--gl:#e8c96a;--gd:#8a6e28;--bg:#07070f;--bg2:#0f0f1c;--ivory:#f0e8d0;}
 body{background:var(--bg);color:var(--ivory);font-family:'IM Fell English',serif;
   min-height:100vh;display:flex;flex-direction:column;align-items:center;
@@ -85,17 +88,32 @@ h1{font-family:'Cinzel',serif;font-size:clamp(.9rem,2.5vw,1.3rem);
 .lesart{margin-top:9px;padding-top:8px;border-top:1px solid rgba(200,168,75,.12);}
 .lesart-t{font-size:.86rem;line-height:1.7;color:var(--ivory);}
 .lesart-l{color:#3a3a4a;font-style:italic;font-size:.78rem;}
-/* Unterstützung: dieselbe Sprache wie die Sprachleiste, nur wärmer. */
-.spende{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;
-  gap:7px;margin-top:26px;padding-top:16px;
+/* Unterstützung — Gestaltung wie im Oracle-Repo. */
+.spende{display:flex;flex-direction:column;align-items:center;
+  margin-top:30px;padding-top:18px;
   border-top:1px solid rgba(200,168,75,.12);width:100%;max-width:760px;}
-.spende-k{font-family:'Cinzel',serif;font-size:.52rem;letter-spacing:.2em;
-  text-transform:uppercase;color:var(--gd);}
-.spende a{font-family:'Cinzel',serif;font-size:.6rem;letter-spacing:.08em;
-  color:var(--gold);text-decoration:none;padding:4px 11px;border-radius:2px;
-  border:1px solid rgba(200,168,75,.35);background:#0a0a16;transition:all .16s;}
-.spende a:hover{background:var(--gd);color:var(--ivory);border-color:var(--gold);}
-.spende a:focus-visible{outline:1px solid var(--gl);outline-offset:2px}
+.spende-k{font-family:'Cinzel',serif;font-size:.56rem;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--gd);margin-bottom:12px;}
+.spendeReihe{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+/* Erzwingt den Umbruch vor dem freien Betrag, ohne ihn über die ganze
+   Zeilenbreite anklickbar zu machen. */
+.spendeReihe::after{content:"";flex-basis:100%;height:0;order:2;}
+.spendeKnopf{display:inline-block;text-decoration:none;
+  border:1px solid var(--gd);border-radius:2px;color:var(--gl);
+  font-family:'Cinzel',serif;font-size:.76rem;letter-spacing:.06em;
+  padding:11px 22px;min-width:6rem;text-align:center;
+  transition:background .18s,color .18s;}
+.spendeKnopf:hover{background:var(--gd);color:var(--ivory);}
+.spendeKnopf:focus-visible{outline:1px solid var(--gl);outline-offset:2px}
+/* Der freie Betrag ist die Nebentür — eigene Zeile, geringeres Gewicht. */
+.spendeKnopf.frei{order:3;margin-top:7px;border:none;padding:4px 6px;
+  min-width:0;color:var(--gd);font-size:.7rem;letter-spacing:.04em;
+  text-decoration:underline;text-decoration-color:rgba(200,168,75,.28);
+  text-underline-offset:.3em;}
+.spendeKnopf.frei:hover{background:none;color:var(--gl);
+  text-decoration-color:var(--gold);}
+.spende-not{font-size:.74rem;line-height:1.65;color:#55596a;font-style:italic;
+  margin:15px auto 0;max-width:30rem;text-align:center;}
 @keyframes fu{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 .fi{animation:fu .35s ease both;}
 .loading::after{content:'…';animation:ld 1s steps(3,end) infinite;}
@@ -105,10 +123,10 @@ h1{font-family:'Cinzel',serif;font-size:clamp(.9rem,2.5vw,1.3rem);
   .hand{width:118%} .wiege{padding-bottom:16%}
   /* Am Telefon werden die Spendenknöpfe mit dem Daumen getroffen:
      mindestens 44 px hoch, damit sie sicher zu treffen sind. */
-  .spende{gap:10px;margin-top:22px;}
-  .spende-k{width:100%;text-align:center;margin-bottom:2px;}
-  .spende a{font-size:.78rem;padding:0 20px;min-height:44px;min-width:76px;
+  .spende{margin-top:24px;}
+  .spendeKnopf{font-size:.84rem;padding:0 22px;min-height:44px;
     display:inline-flex;align-items:center;justify-content:center;}
+  .spendeKnopf.frei{min-height:36px;font-size:.76rem;}
 }
 </style>
 </head>
@@ -166,10 +184,17 @@ h1{font-family:'Cinzel',serif;font-size:clamp(.9rem,2.5vw,1.3rem);
 </div>
 
 <footer class="spende">
-  <span class="spende-k">Diese Arbeit unterstützen</span>
-  <a href="https://www.paypal.me/scholaastronomica/4EUR"  target="_blank" rel="noopener noreferrer">4 €</a>
-  <a href="https://www.paypal.me/scholaastronomica/9EUR"  target="_blank" rel="noopener noreferrer">9 €</a>
-  <a href="https://www.paypal.me/scholaastronomica" target="_blank" rel="noopener noreferrer">Freier Betrag</a>
+  <span class="spende-k">Etwas dalassen</span>
+  <div class="spendeReihe">
+    <a class="spendeKnopf" href="https://paypal.me/scholaastronomica/4EUR"
+       target="_blank" rel="noopener noreferrer" title="Vier Euro">4 €</a>
+    <a class="spendeKnopf" href="https://paypal.me/scholaastronomica/9EUR"
+       target="_blank" rel="noopener noreferrer" title="Neun Euro">9 €</a>
+    <a class="spendeKnopf frei" href="https://paypal.me/scholaastronomica"
+       target="_blank" rel="noopener noreferrer" title="Betrag selbst wählen">anderer Betrag</a>
+  </div>
+  <p class="spende-not">Diese Seite kostet nichts, zeigt keine Werbung und sammelt keine Daten.
+    Wer mag, wirft etwas in den Hut — für den Erhalt oder einfach als Dank.</p>
 </footer>
 
 <script>

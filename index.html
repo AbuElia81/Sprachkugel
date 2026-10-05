@@ -127,6 +127,17 @@ h1{font-family:'Cinzel',serif;font-size:clamp(.9rem,2.5vw,1.3rem);
   .spendeKnopf{font-size:.84rem;padding:0 22px;min-height:44px;
     display:inline-flex;align-items:center;justify-content:center;}
   .spendeKnopf.frei{min-height:36px;font-size:.76rem;}
+
+  /* Alles, was mit dem Daumen getroffen wird, auf 44 Pixel bringen.
+     Die Sprachleiste bleibt bei 36: Bei sieben Knöpfen in zwei Reihen
+     kosten 44 Pixel oben so viel Platz, dass die Kugel verdrängt wird —
+     und die Sprache wählt man einmal, die Schale bei jedem Wort. */
+  #pin{min-height:44px;font-size:1.05rem;}
+  .btn{min-height:44px;min-width:52px;font-size:.72rem;}
+  .schalen .lbtn{min-height:44px;padding:0 14px;font-size:.68rem;
+    display:inline-flex;align-items:center;justify-content:center;}
+  .sprachen .lbtn{min-height:36px;padding:0 10px;font-size:.58rem;
+    display:inline-flex;align-items:center;justify-content:center;}
 }
 </style>
 </head>
